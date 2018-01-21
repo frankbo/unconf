@@ -1,8 +1,10 @@
 module Main exposing (..)
 
 import Html exposing (..)
+import Html.Attributes exposing (..)
 import Navigation exposing (Location)
 import UrlParser exposing (..)
+import Html.Events exposing (onClick, onInput)
 
 
 -- APP
@@ -18,16 +20,18 @@ main =
 
 
 type alias Model =
-    { route : Route }
+    { route : Route, userName : String }
 
 
 type Msg
     = OnLocationChange Location
+    | ShowUser String
+    | UpdateUserName String
 
 
 initialModel : Route -> Model
 initialModel route =
-    { route = route }
+    { route = route, userName = "" }
 
 
 init : Location -> ( Model, Cmd Msg )
@@ -49,20 +53,23 @@ page : Model -> Html Msg
 page model =
     case model.route of
         Home ->
-            homeView
+            homeView model
 
         NotFound ->
             notFoundView
 
 
-homeView : Html Msg
-homeView =
-    div [] [ text "Hello Woop" ]
+homeView : Model -> Html Msg
+homeView model =
+    div [ class "home-page" ]
+        [ input [ type_ "text", placeholder "User name", onInput UpdateUserName ] []
+        , button [ onClick (ShowUser model.userName) ] [ text "go" ]
+        ]
 
 
 notFoundView : Html Msg
 notFoundView =
-    div [] [ text "Hello Not Found" ]
+    div [] [ text "Not Found" ]
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -74,6 +81,13 @@ update msg model =
                     parseLocation location
             in
                 ( { model | route = newRoute }, Cmd.none )
+
+        UpdateUserName userName ->
+            ( { model | userName = userName }, Cmd.none )
+
+        -- TODO redirect to new url
+        ShowUser userName ->
+            ( { model | route = NotFound }, Cmd.none )
 
 
 subscriptions : model -> Sub msg
