@@ -25,7 +25,7 @@ type alias Model =
 
 type Msg
     = OnLocationChange Location
-    | ShowUser String
+    | ShowUser
     | UpdateUserName String
 
 
@@ -58,6 +58,9 @@ page model =
         Admin ->
             homeView model
 
+        User userName ->
+            homeView model
+
         NotFound ->
             notFoundView
 
@@ -66,7 +69,7 @@ homeView : Model -> Html Msg
 homeView model =
     div [ class "home-page" ]
         [ input [ type_ "text", placeholder "User name", onInput UpdateUserName ] []
-        , button [ onClick (ShowUser model.userName) ] [ text "go" ]
+        , button [ onClick ShowUser ] [ text "go" ]
         ]
 
 
@@ -88,9 +91,8 @@ update msg model =
         UpdateUserName userName ->
             ( { model | userName = userName }, Cmd.none )
 
-        -- TODO redirect to new url
-        ShowUser userName ->
-            ( { model | route = NotFound }, Cmd.none )
+        ShowUser ->
+            (model, Navigation.newUrl model.userName )
 
 
 subscriptions : model -> Sub msg
@@ -105,6 +107,7 @@ subscriptions =
 type Route
     = Home
     | Admin
+    | User String
     | NotFound
 
 
@@ -113,6 +116,7 @@ matcher =
     oneOf
         [ UrlParser.map Home top
         , UrlParser.map Admin (UrlParser.s "admin")
+        , UrlParser.map User (top </> string)
         ]
 
 
