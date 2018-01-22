@@ -1,4 +1,4 @@
-module Main exposing (..)
+module App exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -55,6 +55,9 @@ page model =
         Home ->
             homeView model
 
+        Admin ->
+            homeView model
+
         NotFound ->
             notFoundView
 
@@ -101,18 +104,21 @@ subscriptions =
 
 type Route
     = Home
+    | Admin
     | NotFound
 
 
-matchers : Parser (Route -> a) a
-matchers =
+matcher : Parser (Route -> a) a
+matcher =
     oneOf
-        [ UrlParser.map Home top ]
+        [ UrlParser.map Home top
+        , UrlParser.map Admin (UrlParser.s "admin")
+        ]
 
 
 parseLocation : Location -> Route
 parseLocation location =
-    case (parseHash matchers location) of
+    case (parsePath matcher location) of
         Just route ->
             route
 
