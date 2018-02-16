@@ -1,6 +1,7 @@
 # Distribution
 build/
 .idea
+unconf.iml
 
 # elm-package generated files
 elm-stuff
